@@ -64,20 +64,20 @@ La machine 2 est la machine permettant d'intégrer la fonctionnalité des switch
 Elle utilise le contexte c2,  dans lequel COLOR est instanciée: COLOR est une  partition contenant les deux couleurs du feu, Red et Green, qui va nous servir à représenter la fonctionnalité d'un feu.
 Le contexte c2 étends aussi le contexte c1, et possède donc aussi la partition TOWN, contenant Toulouse et Bayonne, le tableau tabVoie contenant les wagons, et enfin nbWagons qui représente la taille des wagons.
 
-La machine m2_switch_light raffine la machine m1_buffer, elle possède donc les mêmes fonctionnalités avec en plus l'ajout du système des feux/aiguillage.
+La machine m2\_switch\_light raffine la machine m1\_buffer, elle possède donc les mêmes fonctionnalités avec en plus l'ajout du système des feux/aiguillage.
 
-La machine m2_switch_light possède 8 variables, donc 3 nouveaux :
+La machine m2\_switch\_light possède 8 variables, donc 3 nouveaux :
 
 -switch , variable qui va représenter le système d'aiguillage, qui va donc contenir la destination de l'aiguillage actuelle.
 -light  , variable qui va représenter le système de feu, qui va donc contenir la couleur du feu actuelle.
 -ready  , booléen qui est true lorsque l'aiguillage est en destination de la même ville contenue dans ensBuffer
 
-Les invariants de la machine m2_switch_light sont donc:
+Les invariants de la machine m2\_switch\_light sont donc:
     -light est une couleur
     -switch est une destination
     -Pour tout i appartenant à ensBuffer et le booléan ready est sur true, alors tabVoie(i) est bien la même destination de switch
 
-L'initialisation de la machine m2_switch_light ne change pas à celle de la machine m1_buffer, hormis qu'elle met light à rouge, car la mettre à vert engendrait des erreurs, et switch à Toulouse, choisi arbitrairement.
+L'initialisation de la machine m2\_switch\_light ne change pas à celle de la machine m1\_buffer, hormis qu'elle met light à rouge, car la mettre à vert engendrait des erreurs, et switch à Toulouse, choisi arbitrairement.
 
 Les évènements incIndex et bufferWagons sont étendues normalement, contrairement aux évenements fromBufferToToulouse et fromBufferToBayonne:
 
