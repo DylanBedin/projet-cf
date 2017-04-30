@@ -59,56 +59,37 @@ Les invariants garantissent que ``currentIndex'' est toujours inférieur ou éga
 
 
 
-La machine 2 est la machine permettant d'intégrer la fonctionnalité des switchs et des feux à la machine 1, et est donc la machine finale, la plus évoluée de notre projet, gérant toutes fonctionnalitées demandées.
+La machine 2 est la machine permettant d'intégrer les fonctionnalités de l'aiguillage et du feu à la machine 1, et est donc la machine finale, la plus évoluée de notre projet, gérant toutes les fonctionnalités demandées.
 //
-Elle utilise le contexte c2,  dans lequel COLOR est instanciée: COLOR est une  partition contenant les deux couleurs du feu, Red et Green, qui va nous servir à représenter la fonctionnalité d'un feu.
-Le contexte c2 étends aussi le contexte c1, et possède donc aussi la partition TOWN, contenant Toulouse et Bayonne, le tableau tabVoie contenant les wagons, et enfin nbWagons qui représente la taille des wagons.
+Elle utilise le contexte c2,  dans lequel COLOR est instancié: COLOR est une  partition contenant les deux couleurs du feu, Red et Green,
+qui va nous servir à représenter la couleur du feu.
+Le contexte c2 étend aussi le contexte c1, et possède donc toutes ses données.
 
-La machine m2\_switch\_light raffine la machine m1\_buffer, elle possède donc les mêmes fonctionnalités avec en plus l'ajout du système des feux/aiguillage.
+La machine ``m2\_switch\_light'' raffine la machine ``m1\_buffer''. Tous les invariants de m1 sont donc déjà prouvés.
 
-La machine m2\_switch\_light possède 8 variables, donc 3 nouveaux :
+La machine m2\_switch\_light possède 8 variables, donc 2 nouvelles:
 
--switch , variable qui va représenter le système d'aiguillage, qui va donc contenir la destination de l'aiguillage actuelle.
--light  , variable qui va représenter le système de feu, qui va donc contenir la couleur du feu actuelle.
--ready  , booléen qui est true lorsque l'aiguillage est en destination de la même ville contenue dans ensBuffer
+-switch: variable qui va représenter le système d'aiguillage, qui va donc contenir la direction de l'aiguillage actuel.
+-light: variable qui va représenter le système de feu, qui va donc contenir la couleur du feu actuel.
 
-Les invariants de la machine m2\_switch\_light sont donc:
+Les invariants de la machine m2\_switch\_light garantissent donc les élèments suivants:
     -light est une couleur
     -switch est une destination
-    -Pour tout i appartenant à ensBuffer et le booléan ready est sur true, alors tabVoie(i) est bien la même destination de switch
+    -Lorsque les wagons sont prêts à partir, pour tous les indices ``i'' compris dans ``ensBuffer'', ``tabVoie(i)'' désigne la même ville
+    que ``switch''
 
-L'initialisation de la machine m2\_switch\_light ne change pas à celle de la machine m1\_buffer, hormis qu'elle met light à rouge, car la mettre à vert engendrait des erreurs, et switch à Toulouse, choisi arbitrairement.
+Dans l'initialisation, on met le feu à la couleur rouge par défaut ainsi que l'aiguillage en direction de Toulouse, cette dernière choisie
+arbitrairement, l'aiguillage pouvant changer.
 
-Les évènements incIndex et bufferWagons sont étendues normalement, contrairement aux évenements fromBufferToToulouse et fromBufferToBayonne:
-
-Concernant tout d'abord les gardes:
-- On vérifie d'abord que ready est bien à TRUE, que le switch a bien la même destination que la ville concernée, et que le feu est vert.
-
-- On vérifie que tout élément d'ensBuffer ont bien pour destination la ville concernée
-
-- On vérifie que pour tout 2  éléments d'ensBuffer ont bien la même ville.
-
-Nous appliquons donc après en actions :
-
-- On assigne à l'ensemble des wagons de la ville concernée tout les éléments présents dans ensBuffer
-
-- On remet ensBuffer vide.
-
-- On met ready à FALSE.
-
-- On met le currentIndex à la position de nextWagonIndex, symbolisant que la partie autrefois entre currentIndex et nextWagonIndex a bien été traité.
-
-Nous avons ensuite les 2 évenements gérant la gestion du feu:
-
-lightChangeToGreen met le feu à vert que lorsque le feu est rouge et que ready est sur TRUE avec tout élément de ensBuffer donnant en destination la même ville que le switch.
-
-lightChangeToRed quant à lui va mettre le feu au rouge lorsque que le feu est vert est que ready est sur FALSE.
-
-Enfin nous allons terminer avec les 2 évènements gérant la fonctionnalité de l'aiguillage, switchChangeToToulouse et switchChangeToBayonne:
-
-Pour la ville Toulouse par exemple:
-
-Chacun de ces évènements possèdent en garde le fait que le feu doit être rouge, que la destination de l'aiguillage est sur la ville Toulouse , et que ready soit sur false, avec le currentIndex inférieur ou égale à nbWagons, et avec tabVoie(currentIndex) à destination de la ville Bayonne.
-Si toutes ces gardes sont respectées, alors on change l'aiguillage vers la ville Toulouse.
-
-Cela est identique pour la ville de Bayonne, en inversant les villes de la fonction switchChangeToToulouse.
+Il s'agissait tout d'abord d'ajouter 4 évènements permettant au feu de passer d'une couleur à l'autre et à l'aiguillage de passer d'une ville à
+l'autre.
+L'évènement ``lightChangeToGreen'' passe le feu à la couleur verte seulement si le feu était à rouge, que le buffer est prêt à être envoyé
+et si l'aiguillage pointe vers la ville correspondant aux wagons de l'ensemble ``ensBuffer''.
+L'évènement ``lightChangeToRed'' passe le feu à la couleur rouge quand le feu est vert est que le buffer n'est pas prêt à être envoyé. Dans les
+faits, cet évènement ne devrait être appelé qu'après l'envoi d'un buffer.
+L'évènement ``switchChangeToToulouse'' change l'aiguillage vers Toulouse, ``switchChangeToBayonne'' le change vers Bayonne. Dans les deux cas,
+il s'agit de vérifier que le feu est bien à rouge, que le switch n'est à la direction souhaité et que l'ensemble que l'on souhaitera envoyé par
+la suite est composé de wagons de la direction de la ville correspondant à l'évènement.
+\\
+Afin d'intégrer nos modifications, il a fallu mettre à jour ``fromBufferToToulouse'' et ``fromBufferToBayonne''. Il s'agit simplement de vérifier
+que dans les évènements, le switch est bien en direction de la ville vers laquelle on souhaite envoyer les wagons et le feu au vert.
