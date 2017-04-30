@@ -1,0 +1,55 @@
+\paragraph{Justification de la modélisation choisie}
+
+\subparagraph{Machine 1: envoi des wagons par le biais d'un buffer}
+
+La première machine se découpe comme suit. Tout d'abord, nous avons créé un
+tableau ``tabVoie'' qui prend des indices compris entre 1 et ``nbWagons'',
+constante définie dans le contexte c1, appartenant aux entiers positifs
+supérieurs à 0, et retourne un champ appartenant à ``TOWN''. Cette dernière
+est une partition. C'est-à-dire que sa valeur est l'un des deux champs
+suivants: ``Toulouse'' ou ``Bayonne''. La voie est donc un tableau composé
+de villes, ``tabVoie(i)'' désignant la ville à laquelle le wagon ``i''
+doit aller.
+\\
+Nous avons décidé de créer directement une machine gérant les wagons par
+groupe. Ainsi, nous avons créé 2 ensembles, ``ensToulouse'' et ``ensBayonne''
+dans lesquels nous stockerons les indices de ``tabVoie'' une fois que les wagons
+seront envoyés. Nous avons décidé de créer des ensembles et non des tableaux
+pour ces voies car l'ordre important peu, il est plus aisé de manipuler
+des ensembles que des indices sur ces deux voies. Ensuite, nous avons un ensemble
+``ensBuffer'' qui servira à stocker les groupes de wagons à la suite allant dans
+la même direction. Nous avons aussi créé un booléen ``ready'' qui, une fois passé
+à ``TRUE'', indiquera à ``ensBuffer'' qu'il faut envoyer l'ensemble dans la voie
+correspondante. Enfin nous avons un système d'index. ``currentIndex'' désigne
+le début du groupe de wagons que nous sommes actuellement en train de traiter
+et ``nextWagonIndex'' devra être incrémenté jusqu'à atteindre l'indice après ce
+groupe de wagons. Ainsi, lorsque ``ready'' sera à ``TRUE'', nous enverrons tous
+les indices de ``tabVoie'' compris entre ``currentIndex'' et ``nextWagonIndex - 1''
+dans l'ensemble correspondant à la ville de ``tabVoie(currentIndex)''. Une fois cela
+effectué, on peut passer le ``currentIndex'' à ``nextWagonIndex''.
+\\
+L'initialisation doit tout d'abord mettre nos trois ensembles égaux à l'ensemble vide.
+Ensuite, nous deux index se positionnent à 1, premier wagon à analyser, et ``ready''
+est égal à ``FALSE''. L'évènement ``incIndex'' sert à incrémenter ``nextWagonIndex''.
+Si l'envoi de wagons n'est pas prêt et que ``nextWagonIndex'' désigne bien un wagon
+sur la voie, et que ``currentIndex'' et ``nextWagonIndex'' désignent des
+wagons allant à la même destination, on incrémente ``nextWagonIndex''.
+L'évènement ``bufferWagons'' sert à bufferiser l'ensemble prêt à être envoyé. Il y a
+ainsi deux conditions d'arrêt afin d'envoyer un groupe de wagons dans le buffer,
+soit ``tabVoie(nextWagonIndex)'' désigne une ville différente de
+``tabVoie(currentIndex)'', soit ``nextWagonIndex'' est égal à ``nbWagons + 1'', auquel
+cas on enverra le dernier groupe de wagons. Cet évènement remplit donc ``ensBuffer''
+et passe le booléen ``ready'' à ``TRUE''. Ce changement de valeur garantit qu'on
+bloque les évènements ``incIndex'' et ``bufferWagons''. Désormais, seuls les envois
+de wagons sont possibles.
+Ainsi, quand ``ready'' est à ``TRUE'', nous nous retrouvons dans deux situations.
+Soit les élèments de ``ensBuffer'' sont égaux à Toulouse et l'on envoie tout dans
+``ensToulouse'', soit c'est Bayonne et l'on envoie tout dans ``ensBayonne''. Cela
+correspond ainsi à faire l'union de l'ensemble actuel des villes avec ``ensBuffer''.
+Par la suite, on reset le booléen ``ready'' à ``FALSE'' et ``ensBuffer'' à l'ensemble
+vide et on passe ``currentIndex'' à la valeur ``nextWagonIndex''.
+\\
+Les invariants garantissent que ``currentIndex'' est toujours inférieur ou égal à
+``nextWagonIndex'' et que pour tout ``i'' appartenant à l'ensemble d'une ville,
+``tabVoie(i)'' retourne bien la ville correspondante. Enfin, on garantit que quand
+``ready'' est à ``TRUE'', tout ``i'' compris entre ``currentIndex'' et ``nextWagonIndex-1'' est compris dans ``ensBuffer''.
