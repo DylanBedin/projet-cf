@@ -93,3 +93,21 @@ la suite est composé de wagons de la direction de la ville correspondant à l'�
 \\
 Afin d'intégrer nos modifications, il a fallu mettre à jour ``fromBufferToToulouse'' et ``fromBufferToBayonne''. Il s'agit simplement de vérifier
 que dans les évènements, le switch est bien en direction de la ville vers laquelle on souhaite envoyer les wagons et le feu au vert.
+
+\paragraph{Historique des décisions prises}
+
+Il a été question de passer par plusieurs versions avant d'arriver à ce résultat. Tout d'abord, nous avions fait un système avec plus de machines
+avec une première envoyant tous les wagons d'un seul coup aux bonnes destinations. Cependant, nous avons jugé plus simple par la suite de
+démarrer directement avec une machine gérant les groupes avec un système de buffer. De même, nous avions découpé l'ajout du feu et l'ajout
+de l'aiguillage en 2 machines distinctes mais les modifications à ajouter étaient beaucoup trop faibles pour justifier ce découpage. Ainsi,
+nous nous retrouvons avec ces 2 machines.
+
+\paragraph{Difficultés rencontrées}
+
+Le problème principal de notre travail est l'invariant 2 qui n'est pas prouvé dans la machine 2. Celui-ci est supposé garantir que pour tous
+les wagons compris dans l'ensemble ``ensBuffer'', quand ils sont prêts à être envoyé, ils correspondent bien à la ville désignée par le switch.
+Cet invariant nous semble indispensable, c'est pourquoi nous l'avons laissé même s'il est n'est pas prouvé. Nous pensons que le problème ne vient
+pas de l'invariant en lui-même mais peut-être d'un manque de précision dans la machine précèdente. En effet, nous avions un invariant que nous avons
+supprimé sans avoir compris les raisons pour lesquelles il n'était pas prouvé: \includegraphics[scale=0.5]{../images/invariant.png}
+
+Celui-ci est supposé garantir que l'ensemble compris dans le buffer est bien les indices compris entre ``currentIndex'' et ``nextWagonIndex''.
